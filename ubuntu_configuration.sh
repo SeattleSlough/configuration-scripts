@@ -60,34 +60,6 @@ sudo apt-get install -y terraform
 
 
 
-# -------install Docker---------
-echo "Installing Docker"
-
-for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
-
-# Add Docker's official GPG key:
-sudo apt-get update
-sudo apt-get install ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-# Add the repository to Apt sources:
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-# add non-root privileges
-sudo groupadd docker
-sudo usermod -aG docker $USER
-newgrp docker
-
-
-
 
 # -------Install containerd-------
 echo "Installing containerd"
@@ -161,8 +133,8 @@ go install sigs.k8s.io/kind@v0.27.0
 # ----------install AWS & GCP CLI-----------
 echo "Installing AWS & GCP CLIs"
 
-snap install aws-cli --classic
-snap install google-cloud-cli --classic
+sudo snap install aws-cli --classic
+sudo snap install google-cloud-cli --classic
 
 
 
@@ -190,15 +162,17 @@ sudo mv /tmp/eksctl /usr/local/bin
 echo "Updating .bashrc"
 
 cat <<EOF >> .bashrc
-cd~
+
+
+cd ~
 
 PROMPT_DIRTRIM=1
 
-git_branch() {
-git branch 2> /dev/null | sed -e '^[^*]/d -e 's/* \(.*\)/ (\1)/
-}
+parse_git_branch() {
+      git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+    }
 
-export PS1="\[\e[32m\]\u@\h\[\033[00m\]:[\033[01;34m]\w\[\e[36m\]\$(git_branch)\[\033[00m\]$
+PS1="\[\e[32m\]\u\[\033[00m\]:\[\e[33m\]\w\[\e[36m\]\$(parse_git_branch)\[\e[0m\]$ "
 
 alias k='kubectl'
 alias ..='cd ..'
@@ -206,3 +180,32 @@ alias ...='cd ../..'
 alias ci='code-insiders'
 
 EOF
+
+
+
+
+# -------install Docker---------
+echo "Installing Docker"
+
+for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# add non-root privileges
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
