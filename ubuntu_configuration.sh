@@ -130,9 +130,10 @@ go install sigs.k8s.io/kind@v0.27.0
 
 
 
-# ----------install AWS & GCP CLI-----------
+# ----------install Helm, AWS & GCP CLI-----------
 echo "Installing AWS & GCP CLIs"
 
+sudo snap install helm --classic
 sudo snap install aws-cli --classic
 sudo snap install google-cloud-cli --classic
 
