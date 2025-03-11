@@ -173,7 +173,7 @@ parse_git_branch() {
       git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
     }
 
-PS1="\[\e[32m\]\u\[\033[00m\]:\[\033[01;34m\]\w\[\e[36m\]\$(parse_git_branch)\[\e[0m\]$ "
+PS1="\[\e[32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\e[36m\]\$(parse_git_branch)\[\e[0m\]$ "
 
 alias k='kubectl'
 alias ..='cd ..'
